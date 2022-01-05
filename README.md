@@ -1,10 +1,12 @@
 # `twitchgg-api-worker`
 
-This project is generated from `worker-typescript-template`.
+[![CI](https://github.com/jebibot/twitchgg-worker/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/jebibot/twitchgg-worker/actions/workflows/main.yml)
+
+An API Backend for twitchgg.tv services.
 
 ## 🔋 Getting Started
 
-[Wrangler](https://developers.cloudflare.com/workers/cli-wrangler/install-update) 1.17 or newer is required. If you are not already familiar with the tool, we recommend that you install the tool and configure it to work with your [Cloudflare account](https://dash.cloudflare.com). Documentation can be found [here](https://developers.cloudflare.com/workers/tooling/wrangler/).
+This project is generated from `worker-typescript-template`. [Wrangler](https://developers.cloudflare.com/workers/cli-wrangler/install-update) 1.17 or newer is required. If you are not already familiar with the tool, we recommend that you install the tool and configure it to work with your [Cloudflare account](https://dash.cloudflare.com). Documentation can be found [here](https://developers.cloudflare.com/workers/tooling/wrangler/).
 
 ### 👩 💻 Developing
 
