@@ -1,8 +1,8 @@
 name = "api"
 type = "javascript"
-zone_id = ""
+zone_id = "56356d69f7669c1467156e90d3b52497"
 account_id = "b42b81236b212a689385d852be1f0bf1"
-route = ""
+route = "https://api.twitchgg.tv/*"
 workers_dev = true
 compatibility_date = "2022-01-03"
 
