@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/jebibot/twitchgg-worker/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/jebibot/twitchgg-worker/actions/workflows/main.yml)
 
-An API Backend for twitchgg.tv services.
+The API Backend for twitchgg.tv services.
 
 ## 🔋 Getting Started
 
