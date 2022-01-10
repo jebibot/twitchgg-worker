@@ -19,13 +19,13 @@ type ChannelData = {
   title: string;
 };
 
-type VideoResponse = {
-  data: VideoData[];
-  error?: string;
+type ClipData = {
+  id: string;
+  thumbnail_url: string;
 };
 
-type ChannelResponse = {
-  data: ChannelData[];
+type ApiResponse<T> = {
+  data: T[];
   error?: string;
 };
 
@@ -57,6 +57,7 @@ export async function handleRequest(request: Request): Promise<Response> {
     origin == null ||
     (!origin.startsWith("http://localhost:") &&
       origin !== "https://twitchgg.tv" &&
+      origin !== "https://gall.dcinside.com" &&
       !origin.endsWith(".twitchgg.tv"))
   ) {
     return new Response("Forbidden", { status: 403 });
@@ -97,7 +98,7 @@ export async function handleRequest(request: Request): Promise<Response> {
       `https://api.twitch.tv/helix/videos?${params}`,
       { headers: await getTwitchApiHeaders() }
     );
-    const videoData = (await response.json()) as VideoResponse;
+    const videoData = (await response.json()) as ApiResponse<VideoData>;
     if (videoData.error) {
       throw new Error(videoData.error);
     }
@@ -112,12 +113,27 @@ export async function handleRequest(request: Request): Promise<Response> {
       `https://api.twitch.tv/helix/channels?${params}`,
       { headers: await getTwitchApiHeaders() }
     );
-    const channelData = (await response.json()) as ChannelResponse;
+    const channelData = (await response.json()) as ApiResponse<ChannelData>;
     if (channelData.error) {
       throw new Error(channelData.error);
     }
     for (const c of channelData.data) {
       result[c.broadcaster_id] = { title: c.title, game: c.game_name };
+    }
+  } else if (url.pathname === "/clips") {
+    if (keySet.size !== 1 || !keySet.has("id")) {
+      throw new Error("Invalid argument!");
+    }
+    const response = await fetch(
+      `https://api.twitch.tv/helix/clips?${params}`,
+      { headers: await getTwitchApiHeaders() }
+    );
+    const clipData = (await response.json()) as ApiResponse<ClipData>;
+    if (clipData.error) {
+      throw new Error(clipData.error);
+    }
+    for (const c of clipData.data) {
+      result[c.id] = { url: c.thumbnail_url.replace(/-preview.*/, ".mp4") };
     }
   } else {
     return new Response("Not Found", { status: 404, headers: corsHeaders });

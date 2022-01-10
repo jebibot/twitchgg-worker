@@ -298,4 +298,106 @@ describe("handleRequest", () => {
       `);
     });
   });
+
+  describe("/clips", () => {
+    it("should throw on invalid argument", async () => {
+      await expect(
+        handleRequest(
+          new Request("/clips?foo=bar", {
+            method: "GET",
+            headers: { Origin: allowedOrigin },
+          })
+        )
+      ).rejects.toBeInstanceOf(Error);
+    });
+
+    it("should request token and data", async () => {
+      global.fetch
+        .mockResolvedValueOnce({
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          json: jest.fn().mockResolvedValue(require("./fixtures/token.json")),
+        })
+        .mockResolvedValueOnce({
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          json: jest.fn().mockResolvedValue(require("./fixtures/clips.json")),
+        });
+      const result = await handleRequest(
+        new Request("/clips?id=AwkwardHelplessSalamanderSwiftRage&id=foo", {
+          method: "GET",
+          headers: { Origin: allowedOrigin },
+        })
+      );
+      expect(global.TWITCH.put.mock.calls[0]).toMatchInlineSnapshot(`
+        Array [
+          "app-token",
+          "token",
+          Object {
+            "expirationTtl": 3540,
+          },
+        ]
+      `);
+      expect(global.fetch.mock.calls[0]).toMatchInlineSnapshot(`
+        Array [
+          "https://id.twitch.tv/oauth2/token?client_id=id&client_secret=secret&grant_type=client_credentials",
+          Object {
+            "method": "POST",
+          },
+        ]
+      `);
+      expect(global.fetch.mock.calls[1]).toMatchInlineSnapshot(`
+        Array [
+          "https://api.twitch.tv/helix/clips?id=AwkwardHelplessSalamanderSwiftRage&id=foo",
+          Object {
+            "headers": Object {
+              "Authorization": "Bearer token",
+              "Client-Id": "id",
+            },
+          },
+        ]
+      `);
+      expect(result.status).toEqual(200);
+      expect(result.body).toMatchInlineSnapshot(`
+        Blob {
+          "parts": Array [
+            "{\\"AwkwardHelplessSalamanderSwiftRage\\":{\\"url\\":\\"https://clips-media-assets.twitch.tv/157589949.mp4\\"}}",
+          ],
+          "type": "",
+        }
+      `);
+    });
+
+    it("should use access token from KV", async () => {
+      global.TWITCH.get.mockResolvedValueOnce("kvtoken");
+      global.fetch.mockResolvedValueOnce({
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        json: jest.fn().mockResolvedValue(require("./fixtures/clips.json")),
+      });
+      const result = await handleRequest(
+        new Request("/clips?id=AwkwardHelplessSalamanderSwiftRage&id=foo", {
+          method: "GET",
+          headers: { Origin: allowedOrigin },
+        })
+      );
+      expect(global.fetch.mock.calls[0]).toMatchInlineSnapshot(`
+        Array [
+          "https://api.twitch.tv/helix/clips?id=AwkwardHelplessSalamanderSwiftRage&id=foo",
+          Object {
+            "headers": Object {
+              "Authorization": "Bearer kvtoken",
+              "Client-Id": "id",
+            },
+          },
+        ]
+      `);
+      expect(result.status).toEqual(200);
+      expect(result.body).toMatchInlineSnapshot(`
+        Blob {
+          "parts": Array [
+            "{\\"AwkwardHelplessSalamanderSwiftRage\\":{\\"url\\":\\"https://clips-media-assets.twitch.tv/157589949.mp4\\"}}",
+          ],
+          "type": "",
+        }
+      `);
+    });
+  });
 });
