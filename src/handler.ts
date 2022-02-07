@@ -58,6 +58,7 @@ export async function handleRequest(request: Request): Promise<Response> {
     (!origin.startsWith("http://localhost:") &&
       origin !== "https://twitchgg.tv" &&
       origin !== "https://gall.dcinside.com" &&
+      origin !== "https://cafe.naver.com" &&
       !origin.endsWith(".twitchgg.tv"))
   ) {
     return new Response("Forbidden", { status: 403 });
